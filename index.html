@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tập huấn AI trong hoạt động ủy thác với NHCSXH</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-2: #eef4ff;
+      --text: #152033;
+      --muted: #607086;
+      --primary: #1357c8;
+      --primary-2: #0b3d91;
+      --accent: #0c9a7a;
+      --warning: #b7791f;
+      --danger: #b42318;
+      --border: #d9e2f2;
+      --shadow: 0 14px 35px rgba(23, 44, 88, 0.12);
+      --radius: 18px;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --surface: #151f33;
+      --surface-2: #182945;
+      --text: #eef4ff;
+      --muted: #b5c3d8;
+      --primary: #7db1ff;
+      --primary-2: #9ec5ff;
+      --accent: #58d6b7;
+      --warning: #f6c76b;
+      --danger: #ff8a7a;
+      --border: #2e405d;
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.62;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .app {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: linear-gradient(180deg, var(--primary-2), #10213e);
+      color: #fff;
+      padding: 22px 18px;
+      z-index: 20;
+    }
+
+    .brand {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      margin-bottom: 18px;
+    }
+
+    .brand .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .78; }
+    .brand h1 { margin: 6px 0 6px; font-size: 20px; line-height: 1.25; }
+    .brand p { margin: 0; font-size: 13px; opacity: .85; }
+
+    .search-box {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      padding: 11px 12px;
+      border-radius: 12px;
+      outline: none;
+      margin-bottom: 12px;
+    }
+    .search-box::placeholder { color: rgba(255, 255, 255, 0.72); }
+
+    nav { display: grid; gap: 6px; }
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, .9);
+    }
+    nav a:hover, nav a.active { background: rgba(255, 255, 255, .16); color: #fff; }
+    nav .num {
+      min-width: 25px;
+      height: 25px;
+      border-radius: 99px;
+      display: inline-grid;
+      place-items: center;
+      background: rgba(255, 255, 255, .16);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .sidebar-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    button, .button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 12px;
+      padding: 10px 13px;
+      font-family: inherit;
+      font-weight: 700;
+      background: var(--primary);
+      color: #fff;
+      transition: transform .15s ease, opacity .15s ease;
+    }
+    button:hover, .button:hover { transform: translateY(-1px); opacity: .96; }
+    button.secondary { background: var(--surface-2); color: var(--primary-2); border: 1px solid var(--border); }
+    button.ghost { background: rgba(255,255,255,.14); color: #fff; border: 1px solid rgba(255,255,255,.24); }
+    button.success { background: var(--accent); }
+    button.warn { background: var(--warning); }
+    button.danger { background: var(--danger); }
+
+    main { min-width: 0; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      display: none;
+      z-index: 30;
+      padding: 10px 14px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero {
+      padding: 48px clamp(18px, 4vw, 54px) 28px;
+      background:
+        radial-gradient(circle at 8% 18%, rgba(19, 87, 200, .18), transparent 28%),
+        radial-gradient(circle at 80% 8%, rgba(12, 154, 122, .16), transparent 26%),
+        var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, .7fr);
+      gap: 24px;
+      align-items: stretch;
+      max-width: 1220px;
+      margin: 0 auto;
+    }
+
+    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--surface-2);
+      color: var(--primary-2);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .hero h2 {
+      margin: 0 0 16px;
+      font-size: clamp(30px, 4.2vw, 56px);
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+    }
+    .hero p.lead { font-size: 18px; color: var(--muted); margin: 0 0 22px; max-width: 820px; }
+
+    .hero-card, .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .hero-card h3 { margin-top: 0; }
+    .meta-list { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; }
+    .meta-list li { display: grid; grid-template-columns: 110px 1fr; gap: 10px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
+    .meta-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+    .meta-list strong { color: var(--primary-2); }
+
+    .content {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 28px clamp(18px, 4vw, 54px) 70px;
+    }
+
+    section {
+      scroll-margin-top: 22px;
+      margin: 28px 0;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 14px;
+      margin: 0 0 14px;
+    }
+    .section-title h2 { margin: 0; font-size: clamp(24px, 3vw, 36px); letter-spacing: -0.02em; }
+    .section-title p { margin: 4px 0 0; color: var(--muted); }
+
+    .grid { display: grid; gap: 16px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .mini-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .mini-card h3 { margin: 0 0 8px; color: var(--primary-2); }
+    .mini-card p, .mini-card ul { margin-bottom: 0; }
+
+    .callout {
+      border-left: 5px solid var(--primary);
+      background: var(--surface-2);
+      padding: 16px 18px;
+      border-radius: 14px;
+      margin: 16px 0;
+    }
+    .callout.warning { border-left-color: var(--warning); }
+    .callout.danger { border-left-color: var(--danger); }
+    .callout.success { border-left-color: var(--accent); }
+
+    details {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 16px;
+    }
+    details + details { margin-top: 10px; }
+    summary { cursor: pointer; font-weight: 800; color: var(--primary-2); }
+    summary::marker { color: var(--primary); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: table;
+    }
+    th, td { border: 1px solid var(--border); padding: 12px; vertical-align: top; text-align: left; }
+    th { background: var(--surface-2); color: var(--primary-2); }
+
+    .table-wrap { width: 100%; overflow-x: auto; border-radius: 16px; }
+
+    .timeline { position: relative; display: grid; gap: 14px; }
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 54px minmax(0,1fr);
+      gap: 14px;
+      align-items: start;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .timeline-index {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 900;
+    }
+    .timeline-item h3 { margin: 0 0 8px; }
+    .timeline-item ul { margin-top: 8px; }
+
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .tab-btn { background: var(--surface); color: var(--primary-2); border: 1px solid var(--border); }
+    .tab-btn.active { background: var(--primary); color: #fff; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .prompt-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .filter-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-chip {
+      background: var(--surface);
+      color: var(--primary-2);
+      border: 1px solid var(--border);
+      padding: 8px 11px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+    .filter-chip.active { background: var(--primary); color: #fff; }
+    .prompt-card { position: relative; }
+    .prompt-text {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 14px;
+      border-radius: 14px;
+      white-space: pre-wrap;
+      font-size: 14px;
+    }
+    .copy-btn { margin-top: 10px; }
+
+    .practice-card label {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .practice-card label:last-child { border-bottom: 0; }
+    input[type="checkbox"] { width: 18px; height: 18px; margin-top: 4px; accent-color: var(--primary); }
+
+    .progress-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .progress-bar {
+      height: 14px;
+      background: var(--surface-2);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .2s ease; }
+
+    textarea, input, select {
+      width: 100%;
+      font: inherit;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 12px;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+    }
+    textarea { min-height: 130px; resize: vertical; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+
+    .checker-result { margin-top: 12px; display: grid; gap: 8px; }
+    .alert {
+      padding: 11px 13px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+    .alert.danger { border-color: rgba(180,35,24,.35); color: var(--danger); }
+    .alert.success { border-color: rgba(12,154,122,.35); color: var(--accent); }
+    .alert.warning { border-color: rgba(183,121,31,.35); color: var(--warning); }
+
+    .quiz-question {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .quiz-question h3 { margin: 0 0 10px; font-size: 17px; }
+    .quiz-options { display: grid; gap: 8px; }
+    .quiz-options label {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      border: 1px solid var(--border);
+      padding: 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      background: var(--surface-2);
+    }
+    .quiz-options input { width: auto; margin-top: 5px; }
+
+    .timer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .time-display { font-size: 42px; font-weight: 900; color: var(--primary-2); letter-spacing: -0.04em; }
+
+    .note-saved { color: var(--accent); font-weight: 700; display: none; }
+
+    .hidden-by-search { display: none !important; }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 26px;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 1024px) {
+      .app { grid-template-columns: 1fr; }
+      aside {
+        position: fixed;
+        transform: translateX(-103%);
+        transition: transform .2s ease;
+        width: min(330px, 88vw);
+      }
+      aside.open { transform: translateX(0); }
+      .topbar { display: flex; justify-content: space-between; align-items: center; }
+      .hero-grid, .grid.two, .grid.three, .grid.four, .form-grid { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      aside, .topbar, .sidebar-actions, .prompt-toolbar button, .copy-btn, .no-print { display: none !important; }
+      .app { display: block; }
+      body { background: #fff; color: #000; }
+      .hero, .card, .mini-card, details, .timeline-item, .quiz-question { box-shadow: none; break-inside: avoid; }
+      section { page-break-inside: avoid; }
+    }
+
+
+    /* ===== Bản nâng cấp: trang mở đầu nổi bật + menu ẩn/hiện ===== */
+    body.menu-collapsed .app {
+      grid-template-columns: 0 minmax(0, 1fr);
+    }
+
+    body.menu-collapsed aside {
+      transform: translateX(-112%);
+      padding-left: 0;
+      padding-right: 0;
+      overflow: hidden;
+      border-right: 0;
+    }
+
+    .menu-toggle-fab {
+      position: fixed;
+      top: 18px;
+      left: 316px;
+      z-index: 60;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      box-shadow: 0 12px 30px rgba(14, 43, 91, .22);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--primary-2);
+    }
+
+    body.menu-collapsed .menu-toggle-fab { left: 16px; }
+
+    .menu-close {
+      width: 100%;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 12, 32, .52);
+      backdrop-filter: blur(3px);
+      z-index: 18;
+    }
+    .sidebar-backdrop.show { display: block; }
+
+    .hero-cover {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding-top: 72px;
+      padding-bottom: 52px;
+      background:
+        radial-gradient(circle at 9% 18%, rgba(72, 120, 255, .28), transparent 27%),
+        radial-gradient(circle at 88% 13%, rgba(0, 190, 158, .22), transparent 27%),
+        radial-gradient(circle at 74% 86%, rgba(255, 188, 84, .22), transparent 30%),
+        linear-gradient(135deg, #f7fbff 0%, #edf6ff 45%, #f7fff9 100%);
+      isolation: isolate;
+    }
+
+    [data-theme="dark"] .hero-cover {
+      background:
+        radial-gradient(circle at 9% 18%, rgba(72, 120, 255, .23), transparent 27%),
+        radial-gradient(circle at 88% 13%, rgba(0, 190, 158, .18), transparent 27%),
+        radial-gradient(circle at 74% 86%, rgba(255, 188, 84, .14), transparent 30%),
+        linear-gradient(135deg, #081224 0%, #0d1b31 52%, #102119 100%);
+    }
+
+    .hero-cover::before,
+    .hero-cover::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(2px);
+      opacity: .75;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .hero-cover::before {
+      width: 330px;
+      height: 330px;
+      right: -110px;
+      top: 80px;
+      background: conic-gradient(from 120deg, rgba(19,87,200,.2), rgba(12,154,122,.2), rgba(255,188,84,.22), rgba(19,87,200,.2));
+      animation: floatOrb 8s ease-in-out infinite;
+    }
+    .hero-cover::after {
+      width: 190px;
+      height: 190px;
+      left: 8%;
+      bottom: 6%;
+      background: linear-gradient(135deg, rgba(19,87,200,.17), rgba(12,154,122,.2));
+      animation: floatOrb 10s ease-in-out infinite reverse;
+    }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-18px) rotate(8deg); }
+    }
+
+    .hero-cover .hero-grid {
+      position: relative;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+      align-items: center;
+      gap: clamp(22px, 4vw, 44px);
+    }
+
+    .intro-panel {
+      position: relative;
+      padding: clamp(6px, 1vw, 12px);
+    }
+
+    .cover-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      margin-bottom: 18px;
+      border-radius: 999px;
+      color: var(--primary-2);
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(19,87,200,.18);
+      box-shadow: 0 8px 20px rgba(19,87,200,.08);
+      font-weight: 900;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+    [data-theme="dark"] .cover-kicker { background: rgba(21,31,51,.72); }
+
+    .ai-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: 0 0 0 7px rgba(19,87,200,.12);
+    }
+
+    .hero-cover h2 {
+      max-width: 900px;
+      font-size: clamp(36px, 5.3vw, 76px);
+      line-height: .98;
+      letter-spacing: -.06em;
+      margin-bottom: 20px;
+    }
+
+    .hero-gradient-text {
+      background: linear-gradient(90deg, var(--primary-2), var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-cover p.lead {
+      font-size: clamp(17px, 1.35vw, 21px);
+      max-width: 840px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 24px 0 22px;
+    }
+
+    .hero-actions .button {
+      padding: 12px 17px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      max-width: 820px;
+    }
+    .hero-stat {
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.74);
+      border: 1px solid rgba(19,87,200,.13);
+      box-shadow: 0 10px 28px rgba(23,44,88,.08);
+    }
+    [data-theme="dark"] .hero-stat { background: rgba(21,31,51,.74); }
+    .hero-stat strong {
+      display: block;
+      font-size: 27px;
+      line-height: 1;
+      color: var(--primary-2);
+      letter-spacing: -.03em;
+    }
+    .hero-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 12.5px;
+      margin-top: 6px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .cover-card {
+      position: relative;
+      overflow: hidden;
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(19,87,200,.16);
+      box-shadow: 0 28px 70px rgba(22, 55, 110, .16);
+    }
+    [data-theme="dark"] .cover-card { background: rgba(21,31,51,.78); }
+    .cover-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 7px;
+      background: linear-gradient(90deg, var(--primary), var(--accent), #f6c76b);
+    }
+
+    .ai-emblem {
+      width: 76px;
+      height: 76px;
+      display: grid;
+      place-items: center;
+      border-radius: 24px;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      font-size: 27px;
+      font-weight: 1000;
+      box-shadow: 0 18px 32px rgba(19,87,200,.24);
+    }
+
+    .cover-message {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(19,87,200,.09), rgba(12,154,122,.1));
+      border: 1px solid rgba(19,87,200,.14);
+      font-weight: 800;
+    }
+
+    .quick-roadmap {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .roadmap-step {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 11px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface-2);
+    }
+    .roadmap-step b {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--surface);
+      color: var(--primary-2);
+      box-shadow: inset 0 0 0 1px var(--border);
+    }
+    .roadmap-step span { color: var(--muted); font-size: 13px; }
+
+    .floating-tip {
+      position: absolute;
+      right: 5%;
+      bottom: 4%;
+      max-width: 270px;
+      padding: 13px 15px;
+      border-radius: 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .floating-tip strong { color: var(--primary-2); }
+
+    @media (max-width: 1180px) {
+      .floating-tip { display: none; }
+      .hero-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 1024px) {
+      body.menu-collapsed .app { grid-template-columns: 1fr; }
+      body.menu-collapsed aside { padding: 22px 18px; overflow-y: auto; }
+      .menu-toggle-fab { display: none; }
+      .hero-cover { min-height: auto; padding-top: 42px; }
+      .hero-cover .hero-grid { grid-template-columns: 1fr; }
+      .sidebar-backdrop.show { display: block; }
+    }
+
+    @media (max-width: 640px) {
+      .hero-cover h2 { font-size: clamp(32px, 12vw, 48px); }
+      .hero-stats { grid-template-columns: 1fr 1fr; }
+      .hero-actions .button { width: 100%; justify-content: center; }
+      .meta-list li { grid-template-columns: 1fr; gap: 2px; }
+    }
+
+  </style>
+</head>
+<body>
+  <button id="menuToggleFab" class="menu-toggle-fab" aria-label="Ẩn hoặc hiện menu" aria-expanded="true">☰ Ẩn menu</button>
+  <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+  <div class="topbar">
+    <button id="menuBtn" class="secondary" aria-label="Ẩn hoặc hiện mục lục" aria-expanded="false">☰ Mở mục lục</button>
+    <strong>Tập huấn AI trong hoạt động ủy thác</strong>
+  </div>
+
+  <div class="app">
+    <aside id="sidebar">
+      <button id="menuClose" class="ghost menu-close">✕ Ẩn menu</button>
+      <div class="brand">
+        <div class="eyebrow">Website giảng dạy tương tác</div>
+        <h1>Ứng dụng AI trong hoạt động ủy thác với NHCSXH</h1>
+        <p>1 ngày - Thứ Tư, 01/07/2026</p>
+      </div>
+      <input id="globalSearch" class="search-box" type="search" placeholder="Tìm nhanh nội dung..." />
+      <nav id="navLinks">
+        <a href="#tong-quan"><span class="num">0</span> Tổng quan</a>
+        <a href="#muc-tieu"><span class="num">1</span> Mục tiêu tập huấn</a>
+        <a href="#ke-hoach"><span class="num">2</span> Kế hoạch 01 ngày</a>
+        <a href="#an-toan"><span class="num">3</span> Nguyên tắc an toàn</a>
+        <a href="#ban-do"><span class="num">4</span> Bản đồ công việc</a>
+        <a href="#cong-cu"><span class="num">5</span> 04 công cụ AI</a>
+        <a href="#prompt"><span class="num">6</span> Kho mẫu prompt</a>
+        <a href="#thuc-hanh"><span class="num">7</span> Bài thực hành</a>
+        <a href="#tuong-tac"><span class="num">8</span> Công cụ tương tác</a>
+        <a href="#quiz"><span class="num">9</span> Kiểm tra nhanh</a>
+        <a href="#ket-luan"><span class="num">10</span> Kết luận</a>
+      </nav>
+      <div class="sidebar-actions">
+        <button id="themeToggle" class="ghost">Đổi nền</button>
+        <button onclick="window.print()" class="ghost">In tài liệu</button>
+      </div>
+    </aside>
+
+    <main>
+      <header class="hero hero-cover" id="tong-quan">
+        <div class="hero-grid">
+          <div class="intro-panel">
+            <div class="cover-kicker"><span class="ai-dot"></span> Website giảng dạy tương tác - 01 ngày</div>
+            <div class="badge-row">
+              <span class="badge">Hội LHPN tỉnh Cà Mau</span>
+              <span class="badge">Ban Thường vụ</span>
+              <span class="badge">NHCSXH</span>
+            </div>
+            <h2><span class="hero-gradient-text">Ứng dụng AI</span><br />trong hoạt động ủy thác với Ngân hàng Chính sách xã hội</h2>
+            <p class="lead">Bài giảng được thiết kế theo dạng trình chiếu - thực hành - kiểm tra nhanh, giúp học viên vừa học vừa tạo sản phẩm có thể sử dụng ngay trong công việc Hội cấp xã.</p>
+            <div class="hero-actions">
+              <a class="button" href="#ke-hoach">▶ Bắt đầu bài giảng</a>
+              <a class="button secondary" href="#tuong-tac">Mở công cụ thực hành</a>
+              <a class="button secondary" href="#prompt">Sao chép prompt mẫu</a>
+            </div>
+            <div class="hero-stats" aria-label="Thông tin nhanh của khóa học">
+              <div class="hero-stat"><strong>01</strong><span>Ngày tập huấn thực hành</span></div>
+              <div class="hero-stat"><strong>04</strong><span>Công cụ AI trọng tâm</span></div>
+              <div class="hero-stat"><strong>12</strong><span>Prompt mẫu dùng ngay</span></div>
+              <div class="hero-stat"><strong>06+</strong><span>Sản phẩm thực hành</span></div>
+            </div>
+          </div>
+          <div class="hero-card cover-card">
+            <div class="ai-emblem">AI</div>
+            <h3>Thông tin lớp tập huấn</h3>
+            <ul class="meta-list">
+              <li><strong>Thời gian</strong><span>Thứ Tư, 01/07/2026</span></li>
+              <li><strong>Đối tượng</strong><span>Chủ tịch Hội LHPN các xã, phường; Uỷ viên Ban Thường vụ Hội LHPN cấp xã.</span></li>
+              <li><strong>Địa điểm</strong><span>Nhà hàng Ánh Nguyệt</span></li>
+              <li><strong>Giảng viên</strong><span>Đặng Việt Duy</span></li>
+              <li><strong>Đơn vị</strong><span>Trung tâm Ngoại ngữ và Tin học - Phân hiệu Trường Đại học Bình Dương tại Cà Mau.</span></li>
+            </ul>
+            <div class="cover-message">Thông điệp chính: AI là trợ lý hỗ trợ, cán bộ Hội là người kiểm tra và chịu trách nhiệm cuối cùng.</div>
+            <div class="quick-roadmap">
+              <div class="roadmap-step"><b>1</b><div><strong>Hiểu AI</strong><br /><span>Nhận diện việc nên dùng và không nên dùng AI.</span></div></div>
+              <div class="roadmap-step"><b>2</b><div><strong>Viết prompt</strong><br /><span>Dùng cấu trúc 06 phần để ra lệnh rõ ràng.</span></div></div>
+              <div class="roadmap-step"><b>3</b><div><strong>Thực hành</strong><br /><span>Tạo bài tuyên truyền, biên bản, checklist, poster.</span></div></div>
+              <div class="roadmap-step"><b>4</b><div><strong>Bảo mật</strong><br /><span>Ẩn danh dữ liệu trước khi đưa vào công cụ AI.</span></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="floating-tip"><strong>Mẹo trình chiếu:</strong> Bấm nút “Ẩn menu” để bài giảng rộng toàn màn hình; bấm lại để mở mục lục.</div>
+      </header>
+
+      <div class="content">
+        <section id="muc-tieu" class="searchable">
+          <div class="section-title">
+            <div>
+              <h2>Phần 1. Mục tiêu tập huấn</h2>
+              <p>Những năng lực học viên cần đạt được sau 01 ngày học.</p>
+            </div>
+          </div>
+          <div class="grid two">
+            <div class="card">
+              <h3>1. Mục tiêu chương trình</h3>
+              <ul>
+                <li>Hiểu khái niệm Trí tuệ nhân tạo (AI) và nhận diện các công việc cụ thể của cán bộ Hội cấp xã trong hoạt động ủy thác mà AI có thể hỗ trợ.</li>
+                <li>Sử dụng được tối thiểu 04 công cụ AI miễn phí hoặc có bản miễn phí: ChatGPT, Google Gemini, NotebookLM, Canva AI.</li>
+                <li>Soạn được các nội dung công việc thường xuyên: bài tuyên truyền, biên bản họp, báo cáo, thư nhắc nhở, tin nhắn truyền thông.</li>
+                <li>Áp dụng AI vào 04 nhóm nghiệp vụ: tuyên truyền chính sách tín dụng; quản lý Tổ Tiết kiệm và vay vốn; kiểm tra, giám sát và xử lý nợ; truyền thông và giáo dục tài chính.</li>
+                <li>Hình thành tư duy sử dụng AI có chọn lọc, đúng mục đích, bảo mật thông tin hội viên, hộ vay và dữ liệu tín dụng nhạy cảm.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>2. Đối tượng tập huấn</h3>
+              <p>Chủ tịch Hội Liên hiệp Phụ nữ các xã, phường và Ủy viên Ban Thường vụ Hội Liên hiệp Phụ nữ cấp xã trên địa bàn tỉnh Cà Mau - lực lượng trực tiếp tham gia thực hiện hoạt động ủy thác cho vay đối với hộ nghèo và các đối tượng chính sách.</p>
+              <h3>3. Yêu cầu chuẩn bị</h3>
+              <ul>
+                <li>Điện thoại thông minh có kết nối 4G/Wi-Fi, có tài khoản Google.</li>
+                <li>Sổ ghi chép để chép lại các câu lệnh đã học.</li>
+                <li>01-02 mẫu văn bản, biên bản, báo cáo gần đây để áp dụng vào bài tập.</li>
+                <li>Không cần mang tài liệu có thông tin cá nhân thật.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout success">
+            <strong>Định hướng phương pháp:</strong> Học viên đã được tập huấn lý thuyết nghiệp vụ trước đó. Lớp này tập trung 100% vào ứng dụng AI cho nghiệp vụ đã có, lấy thực hành làm trọng tâm với 06 bài thực hành cá nhân và sản phẩm có thể dùng ngay.
+          </div>
+          <div class="callout danger">
+            <strong>Lưu ý bảo mật xuyên suốt:</strong> Không nhập vào AI họ tên đầy đủ, số CCCD/CMND, số tài khoản, số tiền vay cụ thể từng hộ, số dư nợ chi tiết, lịch sử trả nợ thực tế, số điện thoại cá nhân, địa chỉ chính xác. Chỉ dùng dữ liệu đã ẩn danh hoặc văn bản chính sách công khai.
+          </div>
+        </section>
+
+        <section id="ke-hoach" class="searchable">
+          <div class="section-title">
+            <div>
+              <h2>Phần 2. Kế hoạch tập huấn 01 ngày</h2>
+              <p>10 nội dung chính, mỗi nội dung có mục tiêu và sản phẩm đầu ra.</p>
+            </div>
+          </div>
+
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-index">1</div>
+              <div>
+                <h3>Tổng quan về AI và ứng dụng trong công việc Hội cấp xã</h3>
+                <p><strong>Nội dung:</strong> AI là gì; AI hỗ trợ cán bộ Hội những việc gì; những việc AI không được thay thế con người; nguyên tắc sử dụng AI trong môi trường có dữ liệu tín dụng chính sách.</p>
+                <p><strong>Sản phẩm:</strong> Học viên nắm vai trò AI như một trợ lý hỗ trợ công việc, biết phân biệt việc nào nên dùng AI và việc nào cần cán bộ tự kiểm tra, xác nhận.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-index">2</div>
+              <div>
+                <h3>Làm quen 04 công cụ AI miễn phí</h3>
+                <ul>
+                  <li><strong>ChatGPT:</strong> soạn thảo, tóm tắt, lập dàn ý, viết báo cáo, biên bản.</li>
+                  <li><strong>Google Gemini:</strong> hỗ trợ viết, tìm ý tưởng, giải thích nội dung, xử lý văn bản.</li>
+                  <li><strong>NotebookLM:</strong> đưa tài liệu chính sách vào để hỏi - đáp, tóm tắt, lập câu hỏi, tạo tài liệu học tập.</li>
+                  <li><strong>Canva AI:</strong> thiết kế poster, tờ rơi, bài đăng tuyên truyền, slide truyền thông.</li>
+                </ul>
+                <p><strong>Thực hành:</strong> Tạo tài khoản hoặc đăng nhập công cụ, nhập câu lệnh đầu tiên, yêu cầu AI viết thử một tin nhắn tuyên truyền ngắn.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-index">3</div>
+              <div>
+                <h3>Kỹ năng viết câu lệnh AI</h3>
+                <p>Cấu trúc câu lệnh hiệu quả gồm 06 phần: vai trò, nhiệm vụ, bối cảnh, đối tượng nghe/đọc, yêu cầu định dạng, ràng buộc bảo mật.</p>
+                <div class="callout">
+                  <strong>Mẫu câu lệnh chung:</strong><br />
+                  Bạn là cán bộ Hội Liên hiệp Phụ nữ cấp xã đang thực hiện hoạt động ủy thác với Ngân hàng Chính sách xã hội. Hãy soạn [loại văn bản/nội dung] về [chủ đề]. Đối tượng đọc là [hội viên/hộ vay/người dân]. Nội dung cần ngắn gọn, dễ hiểu, đúng tinh thần tuyên truyền chính sách, không nêu thông tin cá nhân, không nêu tên hộ vay, không nêu số tiền vay cụ thể. Trình bày theo dạng [bài viết/tin nhắn/biên bản/báo cáo/bảng].
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-index">4</div>
+              <div>
+                <h3>Ứng dụng AI trong tuyên truyền chính sách tín dụng</h3>
+                <p><strong>Nội dung:</strong> Chuyển văn bản chính sách thành ngôn ngữ dễ hiểu; viết bài tuyên truyền Zalo/Facebook; viết kịch bản phát thanh xã/phường; soạn hỏi - đáp thường gặp cho hội viên.</p>
+                <p><strong>Ví dụ câu lệnh:</strong> Bạn là cán bộ Hội Phụ nữ cấp xã. Hãy viết một bài tuyên truyền ngắn khoảng 400 chữ về ý nghĩa của tín dụng chính sách xã hội đối với hộ nghèo, hộ cận nghèo và các đối tượng chính sách. Bài viết dùng cho Fanpage Hội Phụ nữ xã, giọng văn gần gũi, dễ hiểu, tích cực, không nêu tên cá nhân, không nêu thông tin khoản vay cụ thể.</p>
+                <p><strong>Sản phẩm:</strong> Mỗi học viên tạo 01 bài tuyên truyền ngắn; mỗi nhóm tạo 01 kịch bản phát thanh 3 phút.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-index">5</div>
+              <div>
+                <h3>Ứng dụng AI trong quản lý Tổ TK&VV</h3>
+                <p><strong>Nội dung:</strong> Soạn thông báo họp Tổ TK&VV; soạn biên bản sinh hoạt tổ; tạo danh sách nội dung cần nhắc trong buổi họp tổ; soạn tin nhắn nhắc lịch giao dịch xã, lịch nộp lãi, gửi tiết kiệm; lập checklist theo dõi công việc Tổ trưởng.</p>
+                <p><strong>Ví dụ câu lệnh:</strong> Bạn là cán bộ Hội Phụ nữ cấp xã phụ trách theo dõi hoạt động Tổ Tiết kiệm và vay vốn. Hãy soạn mẫu thông báo họp tổ định kỳ tháng, nội dung gồm: thời gian, địa điểm, thành phần, các nội dung cần triển khai, nhắc hội viên thực hiện nghĩa vụ trả lãi, gửi tiết kiệm, sử dụng vốn đúng mục đích. Văn phong trang trọng, ngắn gọn, dễ hiểu.</p>
+                <p><strong>Sản phẩm:</strong> 01 mẫu thông báo họp tổ; 01 mẫu biên bản sinh hoạt Tổ TK&VV; 01 tin nhắn Zalo nhắc lịch giao dịch xã.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-index">6</div>
+              <div>
+                <h3>Ứng dụng AI trong kiểm tra, giám sát hoạt động ủy thác</h3>
+                <p><strong>Nội dung:</strong> Xây dựng checklist kiểm tra Tổ TK&VV; soạn kế hoạch kiểm tra định kỳ; gợi ý câu hỏi khi kiểm tra hộ vay; tổng hợp nội dung kiểm tra thành báo cáo ngắn; phân loại vấn đề sau kiểm tra về hồ sơ, sử dụng vốn, trả lãi, gửi tiết kiệm, sinh hoạt tổ.</p>
+                <p><strong>Ví dụ câu lệnh:</strong> Bạn là cán bộ Hội Phụ nữ cấp xã được phân công kiểm tra hoạt động Tổ TK&VV. Hãy lập checklist kiểm tra gồm các nhóm nội dung: hồ sơ tổ, sinh hoạt tổ, việc bình xét cho vay, việc sử dụng vốn, việc trả lãi, gửi tiết kiệm, công tác tuyên truyền, khó khăn vướng mắc. Trình bày thành bảng gồm 3 cột: Nội dung kiểm tra - Câu hỏi gợi ý - Ghi chú.</p>
+                <div class="callout danger"><strong>Lưu ý:</strong> Không nhập danh sách hộ vay thật, số CCCD, số điện thoại, địa chỉ cụ thể, số tiền vay, tình trạng nợ của từng cá nhân. Chỉ dùng dữ liệu đã ẩn danh như Hộ A, Hộ B, Tổ 1, Tổ 2.</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-index">7</div>
+              <div>
+                <h3>Ứng dụng AI trong xử lý nợ đến hạn, nợ quá hạn và nhắc nhở hội viên</h3>
+                <p><strong>Nội dung:</strong> Soạn thư nhắc nợ/lãi đúng mực, không gây áp lực tiêu cực; viết kịch bản trao đổi trực tiếp với hộ vay; lập kế hoạch phối hợp giữa Hội, Tổ trưởng, NHCSXH và chính quyền địa phương; soạn báo cáo tình hình đôn đốc nợ đến hạn, nợ quá hạn.</p>
+                <p><strong>Ví dụ câu lệnh:</strong> Bạn là cán bộ Hội Phụ nữ cấp xã. Hãy soạn mẫu thư nhắc nhở hội viên thực hiện nghĩa vụ trả lãi và trả nợ đến hạn theo quy định. Nội dung cần lịch sự, động viên, không gây áp lực, không nêu tên cá nhân, không nêu số tiền cụ thể, nhấn mạnh trách nhiệm sử dụng vốn đúng mục đích và trả nợ đúng hạn để duy trì nguồn vốn cho các hộ khác.</p>
+                <details>
+                  <summary>Mở mẫu thư nhắc nhở</summary>
+                  <p>Kính gửi hội viên tham gia vay vốn tín dụng chính sách.</p>
+                  <p>Hội Liên hiệp Phụ nữ xã/phường trân trọng nhắc hội viên quan tâm thực hiện đúng lịch trả lãi, gửi tiết kiệm và trả nợ đến hạn theo quy định. Việc thực hiện đầy đủ nghĩa vụ không chỉ bảo đảm quyền lợi của bản thân, gia đình mà còn góp phần duy trì nguồn vốn tín dụng chính sách để tiếp tục hỗ trợ các hộ nghèo, hộ cận nghèo và các đối tượng chính sách khác trên địa bàn.</p>
+                  <p>Trường hợp gia đình gặp khó khăn, đề nghị hội viên chủ động liên hệ Tổ trưởng Tổ TK&VV hoặc Hội Phụ nữ xã/phường để được hướng dẫn, phối hợp xử lý kịp thời.</p>
+                </details>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-index">8</div>
+              <div>
+                <h3>Ứng dụng AI trong truyền thông và giáo dục tài chính</h3>
+                <p><strong>Nội dung:</strong> Thiết kế thông điệp truyền thông ngắn gọn; tạo poster tuyên truyền bằng Canva AI; viết nội dung giáo dục tài chính cho hội viên; truyền thông về sử dụng vốn đúng mục đích, tiết kiệm định kỳ, trả nợ đúng hạn; xây dựng nội dung sinh hoạt chuyên đề tại chi hội phụ nữ.</p>
+                <div class="grid two">
+                  <div class="mini-card"><h3>Chủ đề gợi ý</h3><ul><li>Vay vốn đúng mục đích - phát triển kinh tế gia đình.</li><li>Gửi tiết kiệm hằng tháng - tạo thói quen tài chính an toàn.</li><li>Trả nợ đúng hạn - giữ uy tín, giữ nguồn vốn cho cộng đồng.</li><li>Không vay ké, không đứng tên hộ, không sử dụng vốn sai mục đích.</li><li>Phụ nữ quản lý tài chính gia đình hiệu quả.</li></ul></div>
+                  <div class="mini-card"><h3>Câu lệnh dùng cho Canva AI</h3><p>Thiết kế poster tuyên truyền khổ dọc về chủ đề “Vay vốn đúng mục đích - Trả nợ đúng hạn - Gửi tiết kiệm đều đặn”. Phong cách trang trọng, gần gũi với phụ nữ nông thôn, màu sắc tươi sáng, có hình ảnh gia đình, phụ nữ làm kinh tế, biểu tượng tiết kiệm. Nội dung ngắn gọn, dễ đọc.</p></div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-index">9</div>
+              <div>
+                <h3>Thực hành tổng hợp theo nhóm</h3>
+                <p>Mỗi nhóm chọn 01 tình huống, sử dụng AI để tạo sản phẩm hoàn chỉnh.</p>
+                <div class="grid two">
+                  <div class="mini-card"><h3>Tình huống 1</h3><p>Chuẩn bị buổi tuyên truyền chính sách tín dụng cho hội viên phụ nữ tại xã.</p><ul><li>01 bài tuyên truyền 500 chữ.</li><li>01 kịch bản phát thanh 3 phút.</li><li>01 poster tuyên truyền bằng Canva.</li></ul></div>
+                  <div class="mini-card"><h3>Tình huống 2</h3><p>Chuẩn bị họp Tổ TK&VV định kỳ tháng.</p><ul><li>01 thông báo họp tổ.</li><li>01 biên bản họp tổ.</li><li>01 danh sách nội dung cần nhắc hội viên.</li></ul></div>
+                  <div class="mini-card"><h3>Tình huống 3</h3><p>Kiểm tra, giám sát Tổ TK&VV.</p><ul><li>01 checklist kiểm tra.</li><li>01 mẫu phiếu ghi nhận kết quả kiểm tra.</li><li>01 báo cáo ngắn sau kiểm tra.</li></ul></div>
+                  <div class="mini-card"><h3>Tình huống 4</h3><p>Nhắc nhở hội viên trả lãi, trả nợ đến hạn.</p><ul><li>01 tin nhắn Zalo.</li><li>01 thư nhắc nhở.</li><li>01 kế hoạch phối hợp xử lý trường hợp khó khăn.</li></ul></div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-index">10</div>
+              <div>
+                <h3>Báo cáo sản phẩm, góp ý và tổng kết</h3>
+                <ul>
+                  <li>Các nhóm trình bày sản phẩm.</li>
+                  <li>Giảng viên góp ý về nội dung, cách dùng AI, độ phù hợp nghiệp vụ.</li>
+                  <li>Nhấn mạnh lỗi cần tránh: sao chép nguyên văn AI không kiểm tra; đưa dữ liệu cá nhân/hộ vay thật lên AI; dùng giọng văn quá cứng; nội dung tuyên truyền chưa bám chính sách; poster quá nhiều chữ.</li>
+                  <li>Học viên hoàn thiện sản phẩm cuối buổi.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="an-toan" class="searchable">
+          <div class="section-title">
+            <div>
+              <h2>Phần 3. Nguyên tắc sử dụng AI an toàn</h2>
+              <p>Quy định cốt lõi khi làm việc với dữ liệu hội viên, hộ vay và tín dụng chính sách.</p>
+            </div>
+          </div>
+          <div class="grid two">
+            <div class="card">
+              <h3>1. AI là trợ lý, không phải người quyết định</h3>
+              <p>AI có thể hỗ trợ soạn thảo, gợi ý, tóm tắt, thiết kế, lập bảng, tạo câu hỏi. Tuy nhiên, quyết định nghiệp vụ, xác nhận thông tin, đánh giá hộ vay, xử lý nợ, đề xuất biện pháp phối hợp vẫn phải do cán bộ có trách nhiệm thực hiện theo quy định.</p>
+              <h3>2. Không dùng AI để thay thế quy trình chính thức</h3>
+              <ul>
+                <li>Quy trình bình xét cho vay.</li>
+                <li>Hồ sơ vay vốn.</li>
+                <li>Biên bản họp tổ chính thức.</li>
+                <li>Xác nhận của NHCSXH.</li>
+                <li>Chỉ đạo của cấp ủy, chính quyền, Hội cấp trên.</li>
+                <li>Quy định nghiệp vụ của Ngân hàng Chính sách xã hội.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>3. Luôn ẩn danh dữ liệu trước khi dùng AI</h3>
+              <ul>
+                <li>Thay “Nguyễn Văn A, ấp X, vay 50 triệu” bằng “Hộ A, thuộc Tổ 1”.</li>
+                <li>Thay “chị B nợ quá hạn 3 tháng” bằng “một trường hợp hộ vay có khoản nợ quá hạn”.</li>
+                <li>Thay số tiền cụ thể bằng “khoản vay đến hạn”, “khoản lãi phải nộp”, “nghĩa vụ tài chính theo quy định”.</li>
+              </ul>
+              <h3>4. Kiểm tra lại trước khi sử dụng</h3>
+              <ul>
+                <li>Có đúng chủ trương, chính sách không?</li>
+                <li>Có đúng thuật ngữ nghiệp vụ không?</li>
+                <li>Có phù hợp với người dân địa phương không?</li>
+                <li>Có lộ thông tin cá nhân không?</li>
+                <li>Có câu nào gây hiểu nhầm hoặc tạo áp lực không phù hợp không?</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Loại thông tin</th><th>Được phép nhập vào AI?</th><th>Cách thay thế nếu cần dùng</th></tr></thead>
+              <tbody>
+                <tr><td>Họ tên đầy đủ của hội viên</td><td><strong>KHÔNG</strong></td><td>Dùng “hộ A”, “hộ B” hoặc “chị X”, “anh Y”.</td></tr>
+                <tr><td>Số CCCD / CMND</td><td><strong>KHÔNG</strong></td><td>Không cần thay thế - không nhập.</td></tr>
+                <tr><td>Số tài khoản ngân hàng</td><td><strong>KHÔNG</strong></td><td>Không cần thay thế - không nhập.</td></tr>
+                <tr><td>Số tiền vay cụ thể từng hộ</td><td><strong>KHÔNG</strong></td><td>Dùng khoảng “vay khoảng 50 triệu” hoặc “vay dưới 100 triệu”.</td></tr>
+                <tr><td>Lịch sử trả nợ cá nhân</td><td><strong>KHÔNG</strong></td><td>Dùng “quá hạn khoảng 3 tháng” - không kèm tên.</td></tr>
+                <tr><td>Số điện thoại, địa chỉ cụ thể</td><td><strong>KHÔNG</strong></td><td>Mô tả khái quát “hộ ở thôn ven sông”.</td></tr>
+                <tr><td>Tên chương trình tín dụng (hộ nghèo, HSSV...)</td><td><strong>Được</strong></td><td>Đây là thông tin công khai.</td></tr>
+                <tr><td>Văn bản chính sách, thông tư, nghị định</td><td><strong>Được</strong></td><td>Đây là thông tin công khai.</td></tr>
+                <tr><td>Mẫu báo cáo, biên bản trống</td><td><strong>Được</strong></td><td>Không có thông tin cá nhân nào.</td></tr>
+                <tr><td>Mô tả tình huống đã ẩn danh hóa</td><td><strong>Được</strong></td><td>Ví dụ: “Có 3 hộ vay quá hạn 2 tháng do thiên tai”.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout warning"><strong>Quy tắc vàng:</strong> Tin AI 80%, kiểm tra 20%, quyết định 100% là của cán bộ Hội. Với dữ liệu hội viên: không bao giờ nhập dữ liệu cá nhân thật vào AI, kể cả với mục đích thử nghiệm.</div>
+        </section>
+
+        <section id="ban-do" class="searchable">
+          <div class="section-title">
+            <div>
+              <h2>Phần 4. Bản đồ công việc có thể ứng dụng AI</h2>
+              <p>Nhóm việc - công việc thực tế - AI hỗ trợ - sản phẩm đầu ra.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Nhóm công việc</th><th>Công việc thực tế</th><th>AI có thể hỗ trợ</th><th>Sản phẩm đầu ra</th></tr></thead>
+              <tbody>
+                <tr><td>Tuyên truyền chính sách</td><td>Phổ biến chương trình tín dụng, quyền và nghĩa vụ hộ vay.</td><td>Viết bài, tóm tắt, tạo hỏi - đáp.</td><td>Bài tuyên truyền, kịch bản phát thanh, tin Zalo.</td></tr>
+                <tr><td>Quản lý Tổ TK&VV</td><td>Nhắc họp tổ, sinh hoạt tổ, theo dõi nội dung tổ.</td><td>Soạn thông báo, biên bản, checklist.</td><td>Thông báo, biên bản, danh sách việc cần làm.</td></tr>
+                <tr><td>Kiểm tra, giám sát</td><td>Kiểm tra hồ sơ, sử dụng vốn, trả lãi, gửi tiết kiệm.</td><td>Tạo phiếu kiểm tra, gợi ý câu hỏi.</td><td>Checklist, phiếu kiểm tra, báo cáo.</td></tr>
+                <tr><td>Xử lý nợ</td><td>Đôn đốc nợ đến hạn, nợ quá hạn, hỗ trợ hộ khó khăn.</td><td>Soạn thư nhắc, kế hoạch phối hợp.</td><td>Thư nhắc, kế hoạch, báo cáo.</td></tr>
+                <tr><td>Truyền thông giáo dục tài chính</td><td>Hướng dẫn tiết kiệm, chi tiêu, sử dụng vốn.</td><td>Viết nội dung, thiết kế poster.</td><td>Poster, bài đăng, slide, tờ rơi.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="cong-cu" class="searchable">
+          <div class="section-title">
+            <div>
+              <h2>Phần 5. Hướng dẫn sử dụng 04 công cụ AI</h2>
+              <p>Chọn đúng công cụ cho đúng nhiệm vụ.</p>
+            </div>
+          </div>
+          <div class="tabs" role="tablist">
+            <button class="tab-btn active" data-tab="tool1">ChatGPT</button>
+            <button class="tab-btn" data-tab="tool2">Google Gemini</button>
+            <button class="tab-btn" data-tab="tool3">NotebookLM</button>
+            <button class="tab-btn" data-tab="tool4">Canva AI</button>
+          </div>
+          <div id="tool1" class="tab-panel active card">
+            <h3>1. ChatGPT</h3>
+            <p><strong>Phù hợp để:</strong></p>
+            <ul><li>Soạn bài tuyên truyền.</li><li>Viết biên bản, báo cáo, thư mời, thông báo.</li><li>Chuyển văn bản dài thành nội dung dễ hiểu.</li><li>Tạo danh sách câu hỏi - trả lời.</li><li>Gợi ý kế hoạch công việc.</li></ul>
+            <p><strong>Cách dùng cơ bản:</strong> B1. Mở ChatGPT. B2. Nhập yêu cầu rõ ràng. B3. Đọc kết quả. B4. Yêu cầu chỉnh sửa: ngắn hơn, trang trọng hơn, gần gũi hơn, đúng mẫu hành chính hơn. B5. Kiểm tra lại trước khi dùng.</p>
+            <div class="callout"><strong>Ví dụ:</strong> Viết lại nội dung sau theo văn phong hành chính, ngắn gọn, dễ hiểu, dùng cho báo cáo của Hội Phụ nữ cấp xã: [dán nội dung đã ẩn danh].</div>
+          </div>
+          <div id="tool2" class="tab-panel card">
+            <h3>2. Google Gemini</h3>
+            <p><strong>Phù hợp để:</strong></p>
+            <ul><li>Tìm ý tưởng truyền thông.</li><li>Viết nội dung ngắn.</li><li>Giải thích khái niệm.</li><li>Tạo bảng kế hoạch.</li><li>Hỗ trợ tạo dàn ý báo cáo.</li></ul>
+            <div class="callout"><strong>Ví dụ:</strong> Hãy lập kế hoạch truyền thông 01 tháng cho Hội Phụ nữ xã về chủ đề sử dụng vốn vay đúng mục đích, trả nợ đúng hạn và gửi tiết kiệm định kỳ. Trình bày theo bảng gồm: tuần, chủ đề, nội dung, hình thức truyền thông, người phụ trách.</div>
+          </div>
+          <div id="tool3" class="tab-panel card">
+            <h3>3. NotebookLM</h3>
+            <p><strong>Phù hợp để:</strong></p>
+            <ul><li>Đưa tài liệu chính sách, hướng dẫn nghiệp vụ, kế hoạch vào để hỏi - đáp.</li><li>Tóm tắt tài liệu dài.</li><li>Tạo câu hỏi kiểm tra kiến thức sau tập huấn.</li><li>Lập tài liệu hỏi - đáp dựa trên nguồn đã cung cấp.</li></ul>
+            <p><strong>Cách dùng gợi ý:</strong> B1. Tạo notebook mới. B2. Tải lên tài liệu chính sách hoặc tài liệu tập huấn đã được phép sử dụng. B3. Đặt câu hỏi như “Tóm tắt tài liệu này thành 10 ý chính”, “Tạo 15 câu hỏi thường gặp cho cán bộ Hội cấp xã”, “Nội dung nào liên quan đến trách nhiệm của tổ chức Hội?”, “Tạo bảng phân công nhiệm vụ theo tài liệu này”.</p>
+            <div class="callout danger"><strong>Lưu ý:</strong> Chỉ tải lên tài liệu được phép sử dụng. Không tải lên danh sách hộ vay thật hoặc hồ sơ tín dụng có thông tin cá nhân.</div>
+          </div>
+          <div id="tool4" class="tab-panel card">
+            <h3>4. Canva AI</h3>
+            <p><strong>Phù hợp để:</strong></p>
+            <ul><li>Thiết kế poster.</li><li>Thiết kế tờ rơi.</li><li>Làm slide tuyên truyền.</li><li>Tạo hình minh họa cho bài đăng.</li><li>Chuyển nội dung thành thiết kế trực quan.</li></ul>
+            <div class="callout"><strong>Ví dụ:</strong> Thiết kế bài đăng Facebook hình vuông về chủ đề “Phụ nữ sử dụng vốn vay đúng mục đích”. Phong cách gần gũi, tích cực, màu sắc tươi sáng, có hình ảnh phụ nữ làm kinh tế gia đình, chữ lớn dễ đọc.</div>
+          </div>
+        </section>
+
+        <section id="prompt" class="searchable">
+          <div class="section-title">
+            <div>
+              <h2>Phần 6. Kho mẫu prompt dùng ngay</h2>
+              <p>Bấm sao chép để dùng trực tiếp trong ChatGPT, Gemini, NotebookLM hoặc Canva AI.</p>
+            </div>
+          </div>
+          <div class="prompt-toolbar">
+            <div class="filter-group">
+              <button class="filter-chip active" data-filter="all">Tất cả</button>
+              <button class="filter-chip" data-filter="tuyen-truyen">Tuyên truyền</button>
+              <button class="filter-chip" data-filter="to-tkvv">Tổ TK&VV</button>
+              <button class="filter-chip" data-filter="kiem-tra">Kiểm tra</button>
+              <button class="filter-chip" data-filter="xu-ly-no">Xử lý nợ</button>
+              <button class="filter-chip" data-filter="tai-chinh">Giáo dục tài chính</button>
+              <button class="filter-chip" data-filter="canva">Canva</button>
+            </div>
+            <span id="copyStatus" class="note-saved">Đã sao chép</span>
+          </div>
+          <div class="grid three" id="promptGrid">
+            <div class="mini-card prompt-card" data-category="tuyen-truyen"><h3>Prompt 1. Viết bài tuyên truyền chính sách tín dụng</h3><div class="prompt-text">Bạn là cán bộ Hội Liên hiệp Phụ nữ cấp xã. Hãy viết bài tuyên truyền khoảng 500 chữ về vai trò của tín dụng chính sách xã hội trong hỗ trợ hộ nghèo, hộ cận nghèo và các đối tượng chính sách phát triển kinh tế, ổn định cuộc sống. Giọng văn gần gũi, dễ hiểu, phù hợp đăng Fanpage Hội Phụ nữ xã. Không nêu thông tin cá nhân, không nêu số tiền vay cụ thể.</div><button class="copy-btn secondary">Sao chép prompt</button></div>
+            <div class="mini-card prompt-card" data-category="tuyen-truyen"><h3>Prompt 2. Viết kịch bản phát thanh</h3><div class="prompt-text">Bạn là cán bộ truyền thông cấp xã. Hãy viết kịch bản phát thanh 3 phút tuyên truyền về việc sử dụng vốn vay đúng mục đích, trả lãi đúng hạn, gửi tiết kiệm đều đặn. Ngôn ngữ dễ hiểu, phù hợp người dân nông thôn, có lời mở đầu và kết thúc.</div><button class="copy-btn secondary">Sao chép prompt</button></div>
+            <div class="mini-card prompt-card" data-category="to-tkvv"><h3>Prompt 3. Soạn thông báo họp Tổ TK&VV</h3><div class="prompt-text">Bạn là cán bộ Hội Phụ nữ cấp xã. Hãy soạn thông báo họp Tổ Tiết kiệm và vay vốn định kỳ tháng. Nội dung gồm thời gian, địa điểm, thành phần, nội dung họp, nhắc hội viên tham dự đúng giờ, thực hiện trả lãi và gửi tiết kiệm theo quy định. Văn phong hành chính, ngắn gọn.</div><button class="copy-btn secondary">Sao chép prompt</button></div>
+            <div class="mini-card prompt-card" data-category="to-tkvv"><h3>Prompt 4. Soạn biên bản họp tổ</h3><div class="prompt-text">Hãy soạn mẫu biên bản sinh hoạt Tổ Tiết kiệm và vay vốn định kỳ. Biên bản gồm: thời gian, địa điểm, thành phần, nội dung triển khai, ý kiến thảo luận, kết luận, nhiệm vụ tháng tới. Không đưa tên cá nhân cụ thể, chỉ để chỗ trống để điền sau.</div><button class="copy-btn secondary">Sao chép prompt</button></div>
+            <div class="mini-card prompt-card" data-category="kiem-tra"><h3>Prompt 5. Tạo checklist kiểm tra Tổ TK&VV</h3><div class="prompt-text">Bạn là cán bộ Hội Phụ nữ cấp xã. Hãy lập checklist kiểm tra hoạt động Tổ TK&VV gồm các nội dung: hồ sơ tổ, sinh hoạt tổ, việc bình xét cho vay, việc sử dụng vốn, trả lãi, gửi tiết kiệm, tuyên truyền chính sách, khó khăn vướng mắc. Trình bày thành bảng.</div><button class="copy-btn secondary">Sao chép prompt</button></div>
+            <div class="mini-card prompt-card" data-category="kiem-tra"><h3>Prompt 6. Viết báo cáo sau kiểm tra</h3><div class="prompt-text">Dựa trên các ý sau: [nhập các ý đã ẩn danh], hãy soạn báo cáo ngắn về kết quả kiểm tra hoạt động Tổ TK&VV. Báo cáo gồm: ưu điểm, tồn tại, nguyên nhân, kiến nghị, đề xuất. Văn phong hành chính, rõ ý, không nêu thông tin cá nhân.</div><button class="copy-btn secondary">Sao chép prompt</button></div>
+            <div class="mini-card prompt-card" data-category="xu-ly-no"><h3>Prompt 7. Soạn thư nhắc trả lãi, trả nợ</h3><div class="prompt-text">Hãy soạn mẫu thư nhắc hội viên thực hiện trả lãi, trả nợ đến hạn và gửi tiết kiệm theo quy định. Giọng văn lịch sự, động viên, không gây áp lực, không nêu tên cá nhân, không nêu số tiền cụ thể.</div><button class="copy-btn secondary">Sao chép prompt</button></div>
+            <div class="mini-card prompt-card" data-category="xu-ly-no"><h3>Prompt 8. Lập kế hoạch phối hợp xử lý nợ quá hạn</h3><div class="prompt-text">Bạn là cán bộ Hội Phụ nữ cấp xã. Hãy lập kế hoạch phối hợp xử lý một số trường hợp nợ quá hạn đã được ẩn danh. Kế hoạch gồm: mục tiêu, thành phần phối hợp, các bước thực hiện, thời gian, cách tuyên truyền vận động, cách báo cáo kết quả. Không nêu thông tin cá nhân.</div><button class="copy-btn secondary">Sao chép prompt</button></div>
+            <div class="mini-card prompt-card" data-category="tuyen-truyen"><h3>Prompt 9. Tạo câu hỏi - trả lời thường gặp</h3><div class="prompt-text">Hãy tạo 15 câu hỏi - trả lời thường gặp cho hội viên về tín dụng chính sách xã hội, tập trung vào: điều kiện vay, sử dụng vốn đúng mục đích, trả lãi, gửi tiết kiệm, trả nợ đúng hạn, trách nhiệm của hộ vay. Trả lời ngắn gọn, dễ hiểu.</div><button class="copy-btn secondary">Sao chép prompt</button></div>
+            <div class="mini-card prompt-card" data-category="tai-chinh"><h3>Prompt 10. Viết nội dung giáo dục tài chính</h3><div class="prompt-text">Hãy viết bài tuyên truyền khoảng 400 chữ với chủ đề “Phụ nữ quản lý tài chính gia đình hiệu quả từ nguồn vốn vay chính sách”. Nội dung gồm: lập kế hoạch sử dụng vốn, ghi chép thu chi, tiết kiệm hằng tháng, trả nợ đúng hạn, tránh vay nóng. Giọng văn gần gũi, tích cực.</div><button class="copy-btn secondary">Sao chép prompt</button></div>
+            <div class="mini-card prompt-card" data-category="canva"><h3>Prompt 11. Thiết kế poster bằng Canva AI</h3><div class="prompt-text">Thiết kế poster tuyên truyền khổ dọc với thông điệp: “Vay vốn đúng mục đích - Gửi tiết kiệm đều đặn - Trả nợ đúng hạn”. Phong cách gần gũi, hình ảnh phụ nữ làm kinh tế, màu sắc tươi sáng, chữ dễ đọc, phù hợp tuyên truyền tại xã/phường.</div><button class="copy-btn secondary">Sao chép prompt</button></div>
+            <div class="mini-card prompt-card" data-category="tuyen-truyen"><h3>Prompt 12. Chuyển văn bản khó thành dễ hiểu</h3><div class="prompt-text">Hãy chuyển nội dung sau thành ngôn ngữ dễ hiểu cho hội viên phụ nữ tại xã/phường. Giữ đúng ý chính, không thêm chính sách mới, trình bày thành 5 gạch đầu dòng ngắn gọn: [dán nội dung đã được phép sử dụng].</div><button class="copy-btn secondary">Sao chép prompt</button></div>
+          </div>
+        </section>
+
+        <section id="thuc-hanh" class="searchable">
+          <div class="section-title">
+            <div>
+              <h2>Phần 7. Bài thực hành cuối khóa</h2>
+              <p>Mỗi nhóm sử dụng tối thiểu 02 công cụ AI để hoàn thành 04 sản phẩm.</p>
+            </div>
+          </div>
+          <div class="grid two">
+            <div class="card practice-card">
+              <h3>Checklist sản phẩm cần nộp</h3>
+              <label><input type="checkbox" class="progress-check" data-key="p1" /> Một bài tuyên truyền chính sách tín dụng.</label>
+              <label><input type="checkbox" class="progress-check" data-key="p2" /> Một mẫu văn bản quản lý Tổ TK&VV.</label>
+              <label><input type="checkbox" class="progress-check" data-key="p3" /> Một checklist kiểm tra, giám sát.</label>
+              <label><input type="checkbox" class="progress-check" data-key="p4" /> Một poster hoặc bài đăng truyền thông giáo dục tài chính.</label>
+              <label><input type="checkbox" class="progress-check" data-key="p5" /> Sản phẩm đã được ẩn danh dữ liệu.</label>
+              <label><input type="checkbox" class="progress-check" data-key="p6" /> Sản phẩm đã được cán bộ kiểm tra lại trước khi sử dụng.</label>
+            </div>
+            <div class="progress-box">
+              <h3>Tiến độ hoàn thành</h3>
+              <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+              <p id="progressText">0% hoàn thành</p>
+              <button id="resetProgress" class="secondary">Xóa tiến độ</button>
+              <div class="callout success"><strong>Gợi ý trình bày cuối khóa:</strong> Mỗi nhóm nêu tình huống, công cụ AI đã dùng, sản phẩm tạo ra, điểm đã chỉnh sửa sau khi kiểm tra và lưu ý bảo mật đã thực hiện.</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tuong-tac" class="searchable">
+          <div class="section-title">
+            <div>
+              <h2>Phần 8. Công cụ tương tác hỗ trợ giảng dạy</h2>
+              <p>Dùng trực tiếp trong lớp để thực hành, kiểm tra dữ liệu và quản lý thời gian.</p>
+            </div>
+          </div>
+          <div class="grid two">
+            <div class="card">
+              <h3>1. Kiểm tra nhanh dữ liệu trước khi đưa vào AI</h3>
+              <p>Dán nội dung dự kiến nhập vào AI. Công cụ sẽ cảnh báo các dấu hiệu nhạy cảm thường gặp như số điện thoại, CCCD/CMND, email, số tiền cụ thể.</p>
+              <textarea id="privacyInput" placeholder="Dán nội dung đã ẩn danh vào đây..."></textarea>
+              <button id="checkPrivacy" class="danger">Kiểm tra dữ liệu</button>
+              <div id="checkerResult" class="checker-result"></div>
+            </div>
+            <div class="card">
+              <h3>2. Tạo prompt theo cấu trúc 06 phần</h3>
+              <div class="form-grid">
+                <input id="roleInput" placeholder="Vai trò: VD cán bộ Hội cấp xã" />
+                <input id="taskInput" placeholder="Nhiệm vụ: VD soạn thông báo" />
+                <input id="contextInput" placeholder="Bối cảnh: VD họp Tổ TK&VV" />
+                <input id="audienceInput" placeholder="Đối tượng: VD hội viên, hộ vay" />
+                <input id="formatInput" placeholder="Định dạng: VD 5 ý, bảng, biên bản" />
+                <input id="securityInput" placeholder="Bảo mật: VD không nêu tên, không số tiền" />
+              </div>
+              <button id="buildPrompt" class="success">Tạo prompt</button>
+              <textarea id="builtPrompt" placeholder="Prompt sẽ hiển thị tại đây..."></textarea>
+              <button id="copyBuiltPrompt" class="secondary">Sao chép prompt vừa tạo</button>
+            </div>
+            <div class="card">
+              <h3>3. Đồng hồ thực hành</h3>
+              <div class="timer">
+                <div class="time-display" id="timeDisplay">10:00</div>
+                <select id="timerSelect">
+                  <option value="300">5 phút</option>
+                  <option value="600" selected>10 phút</option>
+                  <option value="900">15 phút</option>
+                  <option value="1200">20 phút</option>
+                  <option value="1800">30 phút</option>
+                </select>
+              </div>
+              <div class="badge-row no-print">
+                <button id="startTimer">Bắt đầu</button>
+                <button id="pauseTimer" class="secondary">Tạm dừng</button>
+                <button id="resetTimer" class="warn">Đặt lại</button>
+              </div>
+            </div>
+            <div class="card">
+              <h3>4. Ghi chú cá nhân</h3>
+              <p>Ghi chú được lưu trên trình duyệt của máy đang dùng.</p>
+              <textarea id="noteBox" placeholder="Ghi lại prompt hay, ý cần nhớ, câu hỏi của học viên..."></textarea>
+              <p id="noteSaved" class="note-saved">Đã lưu ghi chú</p>
+              <button id="clearNote" class="secondary">Xóa ghi chú</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="quiz" class="searchable">
+          <div class="section-title">
+            <div>
+              <h2>Kiểm tra nhanh cuối buổi</h2>
+              <p>10 câu trắc nghiệm giúp học viên tự đánh giá trước khi tổng kết.</p>
+            </div>
+          </div>
+          <div class="card">
+            <form id="quizForm">
+              <div class="quiz-question" data-answer="b"><h3>1. AI trong hoạt động ủy thác nên được hiểu đúng nhất là gì?</h3><div class="quiz-options"><label><input type="radio" name="q1" value="a"> Người thay cán bộ ra quyết định nghiệp vụ.</label><label><input type="radio" name="q1" value="b"> Trợ lý hỗ trợ soạn thảo, tóm tắt, thiết kế, gợi ý nội dung.</label><label><input type="radio" name="q1" value="c"> Công cụ xác nhận hồ sơ vay vốn chính thức.</label></div></div>
+              <div class="quiz-question" data-answer="c"><h3>2. Thông tin nào không được nhập vào AI?</h3><div class="quiz-options"><label><input type="radio" name="q2" value="a"> Văn bản chính sách công khai.</label><label><input type="radio" name="q2" value="b"> Mẫu biên bản trống.</label><label><input type="radio" name="q2" value="c"> Họ tên đầy đủ và số CCCD của hội viên.</label></div></div>
+              <div class="quiz-question" data-answer="a"><h3>3. Công cụ nào phù hợp để đưa tài liệu chính sách vào hỏi - đáp, tóm tắt?</h3><div class="quiz-options"><label><input type="radio" name="q3" value="a"> NotebookLM.</label><label><input type="radio" name="q3" value="b"> Canva AI.</label><label><input type="radio" name="q3" value="c"> Máy tính bỏ túi.</label></div></div>
+              <div class="quiz-question" data-answer="b"><h3>4. Cấu trúc prompt hiệu quả trong tài liệu gồm mấy phần?</h3><div class="quiz-options"><label><input type="radio" name="q4" value="a"> 3 phần.</label><label><input type="radio" name="q4" value="b"> 6 phần.</label><label><input type="radio" name="q4" value="c"> 10 phần.</label></div></div>
+              <div class="quiz-question" data-answer="c"><h3>5. Câu nào thể hiện cách ẩn danh phù hợp?</h3><div class="quiz-options"><label><input type="radio" name="q5" value="a"> Ghi đủ tên, địa chỉ, số tiền để AI xử lý chính xác.</label><label><input type="radio" name="q5" value="b"> Ghi số điện thoại nhưng bỏ tên.</label><label><input type="radio" name="q5" value="c"> Dùng “Hộ A, thuộc Tổ 1”, không kèm thông tin cá nhân.</label></div></div>
+              <div class="quiz-question" data-answer="a"><h3>6. Canva AI phù hợp nhất với nhiệm vụ nào?</h3><div class="quiz-options"><label><input type="radio" name="q6" value="a"> Thiết kế poster, tờ rơi, bài đăng truyền thông.</label><label><input type="radio" name="q6" value="b"> Xác nhận nợ vay từng hộ.</label><label><input type="radio" name="q6" value="c"> Thay thế biên bản họp tổ chính thức.</label></div></div>
+              <div class="quiz-question" data-answer="b"><h3>7. Sau khi AI tạo nội dung, cán bộ cần làm gì?</h3><div class="quiz-options"><label><input type="radio" name="q7" value="a"> Dùng ngay vì AI luôn đúng.</label><label><input type="radio" name="q7" value="b"> Kiểm tra lại chính sách, thuật ngữ, tính phù hợp và bảo mật.</label><label><input type="radio" name="q7" value="c"> Đưa thêm dữ liệu cá nhân để AI sửa kỹ hơn.</label></div></div>
+              <div class="quiz-question" data-answer="a"><h3>8. Một sản phẩm thực hành trong quản lý Tổ TK&VV là gì?</h3><div class="quiz-options"><label><input type="radio" name="q8" value="a"> Mẫu thông báo họp tổ.</label><label><input type="radio" name="q8" value="b"> Danh sách hộ vay thật đưa lên AI.</label><label><input type="radio" name="q8" value="c"> Quyết định cho vay tự động.</label></div></div>
+              <div class="quiz-question" data-answer="c"><h3>9. Quy tắc vàng trong tài liệu là gì?</h3><div class="quiz-options"><label><input type="radio" name="q9" value="a"> Tin AI 100%.</label><label><input type="radio" name="q9" value="b"> Không cần cán bộ kiểm tra nếu AI viết hay.</label><label><input type="radio" name="q9" value="c"> Tin AI 80%, kiểm tra 20%, quyết định 100% là của cán bộ Hội.</label></div></div>
+              <div class="quiz-question" data-answer="b"><h3>10. Bài thực hành cuối khóa yêu cầu mỗi nhóm sử dụng tối thiểu mấy công cụ AI?</h3><div class="quiz-options"><label><input type="radio" name="q10" value="a"> 01 công cụ.</label><label><input type="radio" name="q10" value="b"> 02 công cụ.</label><label><input type="radio" name="q10" value="c"> 04 công cụ bắt buộc cho mọi nhóm.</label></div></div>
+              <button type="submit" class="success">Chấm điểm</button>
+              <button type="button" id="resetQuiz" class="secondary">Làm lại</button>
+            </form>
+            <div id="quizResult" class="checker-result"></div>
+          </div>
+        </section>
+
+        <section id="ket-luan" class="searchable">
+          <div class="section-title">
+            <div>
+              <h2>Phần 8. Kết luận</h2>
+              <p>Thông điệp cuối khóa và định hướng sử dụng AI có trách nhiệm.</p>
+            </div>
+          </div>
+          <div class="card">
+            <p>Ứng dụng AI trong hoạt động ủy thác với Ngân hàng Chính sách xã hội không nhằm thay thế vai trò của cán bộ Hội, mà nhằm giúp cán bộ Hội làm việc nhanh hơn, rõ hơn, hiệu quả hơn. AI có thể hỗ trợ soạn thảo văn bản, tuyên truyền chính sách, chuẩn bị nội dung họp tổ, lập checklist kiểm tra, viết báo cáo và thiết kế sản phẩm truyền thông.</p>
+            <p>Tuy nhiên, hoạt động ủy thác liên quan trực tiếp đến người dân, hội viên, hộ vay và dữ liệu tín dụng chính sách. Vì vậy, cán bộ Hội cần sử dụng AI có chọn lọc, có kiểm tra, có trách nhiệm và tuyệt đối chú trọng bảo mật thông tin.</p>
+            <div class="callout success"><strong>Thông điệp cuối khóa:</strong> “AI là công cụ hỗ trợ. Cán bộ Hội là người hiểu dân, sát dân và chịu trách nhiệm cuối cùng trong công việc.”</div>
+            <p><strong>Giảng viên:</strong> Đặng Việt Duy<br />Trung tâm Ngoại ngữ và Tin học - Phân hiệu Trường Đại học Bình Dương tại Cà Mau<br />Cà Mau, ngày 28 tháng 6 năm 2026</p>
+          </div>
+        </section>
+      </div>
+
+      <footer class="footer">
+        Nguồn nội dung: Tài Liệu Tập Huấn AI.pdf - Website được thiết kế dạng 01 trang, chạy offline, có tương tác bằng HTML/CSS/JavaScript.
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    const $ = (selector, scope = document) => scope.querySelector(selector);
+    const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
+
+    const sidebar = $('#sidebar');
+    const menuBtn = $('#menuBtn');
+    const menuFab = $('#menuToggleFab');
+    const menuClose = $('#menuClose');
+    const sidebarBackdrop = $('#sidebarBackdrop');
+    const mobileQuery = window.matchMedia('(max-width: 1024px)');
+
+    function isMobileMenu() {
+      return mobileQuery.matches;
+    }
+
+    function syncMenuState() {
+      const mobileOpen = sidebar.classList.contains('open');
+      const desktopCollapsed = document.body.classList.contains('menu-collapsed');
+      if (menuBtn) {
+        menuBtn.textContent = mobileOpen ? '✕ Đóng mục lục' : '☰ Mở mục lục';
+        menuBtn.setAttribute('aria-expanded', String(mobileOpen));
+      }
+      if (menuFab) {
+        menuFab.textContent = desktopCollapsed ? '☰ Mở menu' : '☰ Ẩn menu';
+        menuFab.setAttribute('aria-expanded', String(!desktopCollapsed));
+      }
+      if (sidebarBackdrop) sidebarBackdrop.classList.toggle('show', isMobileMenu() && mobileOpen);
+    }
+
+    function closeMobileMenu() {
+      sidebar.classList.remove('open');
+      syncMenuState();
+    }
+
+    function toggleMenu() {
+      if (isMobileMenu()) {
+        sidebar.classList.toggle('open');
+      } else {
+        document.body.classList.toggle('menu-collapsed');
+      }
+      syncMenuState();
+    }
+
+    menuBtn?.addEventListener('click', toggleMenu);
+    menuFab?.addEventListener('click', toggleMenu);
+    menuClose?.addEventListener('click', () => {
+      if (isMobileMenu()) sidebar.classList.remove('open');
+      else document.body.classList.add('menu-collapsed');
+      syncMenuState();
+    });
+    sidebarBackdrop?.addEventListener('click', closeMobileMenu);
+    $$('#navLinks a').forEach(link => link.addEventListener('click', () => {
+      if (isMobileMenu()) closeMobileMenu();
+    }));
+    window.addEventListener('resize', () => {
+      if (!isMobileMenu()) sidebar.classList.remove('open');
+      syncMenuState();
+    });
+    syncMenuState();
+
+    $('#themeToggle').addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem('ai-course-theme', next);
+    });
+    const savedTheme = localStorage.getItem('ai-course-theme');
+    if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+
+    const navLinks = $$('#navLinks a');
+    const sections = navLinks.map(a => $(a.getAttribute('href'))).filter(Boolean);
+    const activateNav = () => {
+      let current = sections[0]?.id;
+      sections.forEach(sec => {
+        if (window.scrollY >= sec.offsetTop - 130) current = sec.id;
+      });
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
+    };
+    window.addEventListener('scroll', activateNav);
+    activateNav();
+
+    $('#globalSearch').addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      $$('.searchable').forEach(sec => {
+        const match = !q || sec.innerText.toLowerCase().includes(q);
+        sec.classList.toggle('hidden-by-search', !match);
+      });
+    });
+
+    $$('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
+      $$('.tab-btn').forEach(b => b.classList.remove('active'));
+      $$('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      $('#' + btn.dataset.tab).classList.add('active');
+    }));
+
+    const showCopyStatus = (text = 'Đã sao chép') => {
+      const status = $('#copyStatus');
+      status.textContent = text;
+      status.style.display = 'inline';
+      setTimeout(() => status.style.display = 'none', 1500);
+    };
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (err) {
+        const tmp = document.createElement('textarea');
+        tmp.value = text;
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand('copy');
+        tmp.remove();
+      }
+      showCopyStatus();
+    }
+
+    $$('.copy-btn').forEach(btn => btn.addEventListener('click', () => {
+      const text = $('.prompt-text', btn.closest('.prompt-card')).innerText;
+      copyText(text);
+    }));
+
+    $$('.filter-chip').forEach(btn => btn.addEventListener('click', () => {
+      $$('.filter-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      $$('.prompt-card').forEach(card => {
+        card.style.display = filter === 'all' || card.dataset.category === filter ? '' : 'none';
+      });
+    }));
+
+    const checks = $$('.progress-check');
+    function updateProgress() {
+      let done = 0;
+      checks.forEach(c => {
+        localStorage.setItem('practice-' + c.dataset.key, c.checked ? '1' : '0');
+        if (c.checked) done++;
+      });
+      const pct = checks.length ? Math.round(done / checks.length * 100) : 0;
+      $('#progressFill').style.width = pct + '%';
+      $('#progressText').textContent = pct + '% hoàn thành (' + done + '/' + checks.length + ' mục)';
+    }
+    checks.forEach(c => {
+      c.checked = localStorage.getItem('practice-' + c.dataset.key) === '1';
+      c.addEventListener('change', updateProgress);
+    });
+    $('#resetProgress').addEventListener('click', () => {
+      checks.forEach(c => { c.checked = false; localStorage.removeItem('practice-' + c.dataset.key); });
+      updateProgress();
+    });
+    updateProgress();
+
+    $('#checkPrivacy').addEventListener('click', () => {
+      const text = $('#privacyInput').value;
+      const result = $('#checkerResult');
+      const alerts = [];
+      const patterns = [
+        { name: 'Có thể chứa số điện thoại', regex: /(0|\+84)[\s.-]?\d{2,3}[\s.-]?\d{3}[\s.-]?\d{3,4}/g, level: 'danger' },
+        { name: 'Có thể chứa CCCD/CMND hoặc dãy số định danh dài', regex: /\b\d{9}\b|\b\d{12}\b/g, level: 'danger' },
+        { name: 'Có thể chứa email cá nhân', regex: /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, level: 'danger' },
+        { name: 'Có thể chứa số tiền cụ thể', regex: /\b\d+[\.,]?\d*\s*(triệu|trieu|nghìn|ngan|đồng|dong|vnd|VNĐ)\b/gi, level: 'warning' },
+        { name: 'Có thể chứa địa chỉ cụ thể', regex: /(ấp|khóm|phường|xã|huyện|tỉnh|số nhà|đường)\s+[A-Za-zÀ-ỹ0-9\s.-]{2,}/gi, level: 'warning' }
+      ];
+      patterns.forEach(p => { if (p.regex.test(text)) alerts.push(p); });
+      if (!text.trim()) {
+        result.innerHTML = '<div class="alert warning">Bạn chưa nhập nội dung để kiểm tra.</div>';
+      } else if (alerts.length === 0) {
+        result.innerHTML = '<div class="alert success"><strong>Tạm ổn:</strong> Chưa phát hiện dấu hiệu nhạy cảm phổ biến. Vẫn cần cán bộ tự kiểm tra lại trước khi dùng AI.</div>';
+      } else {
+        result.innerHTML = alerts.map(a => '<div class="alert ' + a.level + '"><strong>Cảnh báo:</strong> ' + a.name + '. Hãy ẩn danh hoặc loại bỏ trước khi đưa vào AI.</div>').join('') + '<div class="alert warning">Gợi ý: thay tên thật bằng Hộ A/Hộ B, bỏ CCCD/số điện thoại, thay số tiền cụ thể bằng mô tả khái quát.</div>';
+      }
+    });
+
+    $('#buildPrompt').addEventListener('click', () => {
+      const role = $('#roleInput').value || 'cán bộ Hội Liên hiệp Phụ nữ cấp xã';
+      const task = $('#taskInput').value || 'soạn nội dung công việc';
+      const context = $('#contextInput').value || 'hoạt động ủy thác với Ngân hàng Chính sách xã hội';
+      const audience = $('#audienceInput').value || 'hội viên, hộ vay, người dân';
+      const format = $('#formatInput').value || 'ngắn gọn, dễ hiểu, trình bày rõ ý';
+      const security = $('#securityInput').value || 'không nêu thông tin cá nhân, không nêu tên hộ vay, không nêu số tiền vay cụ thể';
+      $('#builtPrompt').value = `Bạn là ${role} đang thực hiện ${context}. Hãy ${task}. Đối tượng đọc/nghe là ${audience}. Yêu cầu định dạng: ${format}. Ràng buộc bảo mật: ${security}. Nội dung cần đúng tinh thần tuyên truyền chính sách, gần gũi, dễ hiểu và có thể áp dụng trong thực tế.`;
+    });
+    $('#copyBuiltPrompt').addEventListener('click', () => copyText($('#builtPrompt').value));
+
+    let timerSeconds = Number($('#timerSelect').value);
+    let timerInterval = null;
+    function renderTimer() {
+      const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+      const s = String(timerSeconds % 60).padStart(2, '0');
+      $('#timeDisplay').textContent = `${m}:${s}`;
+    }
+    $('#timerSelect').addEventListener('change', e => { timerSeconds = Number(e.target.value); renderTimer(); });
+    $('#startTimer').addEventListener('click', () => {
+      if (timerInterval) return;
+      timerInterval = setInterval(() => {
+        timerSeconds = Math.max(0, timerSeconds - 1);
+        renderTimer();
+        if (timerSeconds === 0) { clearInterval(timerInterval); timerInterval = null; alert('Hết thời gian thực hành!'); }
+      }, 1000);
+    });
+    $('#pauseTimer').addEventListener('click', () => { clearInterval(timerInterval); timerInterval = null; });
+    $('#resetTimer').addEventListener('click', () => { clearInterval(timerInterval); timerInterval = null; timerSeconds = Number($('#timerSelect').value); renderTimer(); });
+    renderTimer();
+
+    const noteBox = $('#noteBox');
+    noteBox.value = localStorage.getItem('ai-course-note') || '';
+    noteBox.addEventListener('input', () => {
+      localStorage.setItem('ai-course-note', noteBox.value);
+      $('#noteSaved').style.display = 'block';
+      clearTimeout(window.noteTimeout);
+      window.noteTimeout = setTimeout(() => $('#noteSaved').style.display = 'none', 1200);
+    });
+    $('#clearNote').addEventListener('click', () => { noteBox.value = ''; localStorage.removeItem('ai-course-note'); });
+
+    $('#quizForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      let score = 0;
+      const questions = $$('.quiz-question');
+      questions.forEach((q, idx) => {
+        const name = 'q' + (idx + 1);
+        const chosen = $(`input[name="${name}"]:checked`);
+        const correct = chosen?.value === q.dataset.answer;
+        if (correct) score++;
+        q.style.borderColor = correct ? 'rgba(12,154,122,.75)' : 'rgba(180,35,24,.65)';
+      });
+      const pct = Math.round(score / questions.length * 100);
+      $('#quizResult').innerHTML = `<div class="alert ${pct >= 70 ? 'success' : 'warning'}"><strong>Kết quả:</strong> ${score}/${questions.length} câu đúng (${pct}%). ${pct >= 70 ? 'Đạt yêu cầu ôn tập.' : 'Nên xem lại phần nguyên tắc an toàn và kho prompt.'}</div>`;
+    });
+    $('#resetQuiz').addEventListener('click', () => {
+      $('#quizForm').reset();
+      $$('.quiz-question').forEach(q => q.style.borderColor = 'var(--border)');
+      $('#quizResult').innerHTML = '';
+    });
+  </script>
+</body>
+</html>
